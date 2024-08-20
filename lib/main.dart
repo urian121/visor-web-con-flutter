@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(
@@ -18,11 +19,17 @@ class WebViewApp extends StatefulWidget {
 }
 
 class _WebViewAppState extends State<WebViewApp> {
-  late final WebViewController _controller;
+  late WebViewController _controller;
+  String _currentUrl = 'https://google.com';
 
   @override
   void initState() {
     super.initState();
+    _initializeWebView();
+  }
+
+  Future<void> _initializeWebView() async {
+    await _loadSavedUrl(); // Cargar la URL guardada antes de inicializar el controlador
 
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -30,7 +37,26 @@ class _WebViewAppState extends State<WebViewApp> {
         WebChromeClient(onUnhandledException: (WebException exception) {
           // Maneja la excepción aquí, por ejemplo, muestra un mensaje de error al usuario
         }),
-      );
+      )
+      ..loadRequest(Uri.parse(_currentUrl));
+  }
+
+  Future<void> _loadSavedUrl() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? savedUrl = prefs.getString('saved_url');
+    if (savedUrl != null && savedUrl.isNotEmpty) {
+      setState(() {
+        _currentUrl = savedUrl;
+      });
+    }
+  }
+
+  Future<void> _saveUrl(String url) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('saved_url', url);
+    setState(() {
+      _currentUrl = url;
+    });
   }
 
   @override
@@ -42,85 +68,102 @@ class _WebViewAppState extends State<WebViewApp> {
       ),
       body: Container(
         decoration: const BoxDecoration(
-          color: Colors.white, // Color de fondo
-
+          color: Colors.white,
           image: DecorationImage(
-            image:
-                AssetImage('assets/images/background.png'), // Imagen de fondo
-
+            image: AssetImage('assets/images/background.png'),
             fit: BoxFit.cover,
           ),
         ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Center(
-                child: Image.asset('assets/images/logo.png'),
-              ),
-
-              //Espacio en blanco
-
-              const SizedBox(height: 20),
-
-              const Text(
-                'Tecno Escuela Gaitán...',
-                style: TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black),
-              ),
-
-              ElevatedButton(
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Visitar Sitio',
-                      style: TextStyle(
-                          fontSize: 20, color: Color.fromARGB(255, 73, 73, 73)),
+        child: Stack(
+          children: [
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(
+                    child: Image.asset('assets/images/logo.png'),
+                  ),
+                  const Text(
+                    'Tecno Escuela Gaitán...',
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
                     ),
-                    SizedBox(width: 10),
-                    Icon(Icons.settings, size: 28, color: Colors.grey),
-                  ],
+                  ),
+                  const SizedBox(height: 50),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.blue,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
+                      textStyle: const TextStyle(fontSize: 20),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Visitar Sitio',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                      ],
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              WebViewWidget(controller: _controller),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Align(
+              alignment: Alignment.topRight,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: const Color(0xFF257bb4),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
+                    textStyle: const TextStyle(fontSize: 17),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Cambiar URL',
+                        style: TextStyle(fontSize: 20, color: Colors.white),
+                      ),
+                      SizedBox(width: 10),
+                      Icon(Icons.settings, size: 28, color: Colors.white),
+                    ],
+                  ),
+                  onPressed: () {
+                    MaterialPageRoute router = MaterialPageRoute(
+                      builder: (context) => SegundaPage(
+                        onUrlChanged: (newUrl) async {
+                          await _controller.loadRequest(Uri.parse(newUrl));
+                          await _saveUrl(newUrl);
+                        },
+                      ),
+                    );
+                    Navigator.of(context).push(router);
+                  },
                 ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            WebViewWidget(controller: _controller)),
-                  );
-                },
               ),
-
-              ElevatedButton(
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Cambiar URL',
-                      style: TextStyle(
-                          fontSize: 20, color: Color.fromARGB(255, 73, 73, 73)),
-                    ),
-                    SizedBox(width: 10),
-                    Icon(Icons.settings, size: 28, color: Colors.grey),
-                  ],
-                ),
-                onPressed: () {
-                  MaterialPageRoute router = MaterialPageRoute(
-                    builder: (context) => SegundaPage(
-                      onUrlChanged: (newUrl) {
-                        _controller.loadRequest(Uri.parse(newUrl));
-                      },
-                    ),
-                  );
-
-                  Navigator.of(context).push(router);
-                },
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -152,7 +195,6 @@ class SegundaPage extends StatefulWidget {
 
 class _SegundaPageState extends State<SegundaPage> {
   final _formKey = GlobalKey<FormState>();
-
   final _urlController = TextEditingController();
 
   @override
@@ -180,7 +222,6 @@ class _SegundaPageState extends State<SegundaPage> {
                   if (value == null || value.isEmpty) {
                     return 'Por favor, ingrese una URL';
                   }
-
                   return null;
                 },
               ),
@@ -189,7 +230,6 @@ class _SegundaPageState extends State<SegundaPage> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     widget.onUrlChanged(_urlController.text);
-
                     Navigator.pop(context);
                   }
                 },
