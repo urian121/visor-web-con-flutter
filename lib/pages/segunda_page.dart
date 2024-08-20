@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class SegundaPage extends StatefulWidget {
-  const SegundaPage({super.key});
+  final void Function(String) onUrlChanged;
+
+  const SegundaPage({super.key, required this.onUrlChanged});
 
   @override
   State<SegundaPage> createState() => _SegundaPageState();
@@ -43,9 +45,8 @@ class _SegundaPageState extends State<SegundaPage> {
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    // Registrar la nueva URL
-                    _registerNewUrl(_urlController.text);
-                    // Puedes navegar a otra pantalla o realizar otra acción
+                    widget.onUrlChanged(_urlController.text);
+                    Navigator.pop(context);
                   }
                 },
                 child: const Text('Registrar URL'),
@@ -55,11 +56,5 @@ class _SegundaPageState extends State<SegundaPage> {
         ),
       ),
     );
-  }
-
-  void _registerNewUrl(String newUrl) {
-    // Aquí puedes agregar la lógica para registrar la nueva URL
-    // Por ejemplo, puedes guardar la URL en un archivo o en una base de datos
-    print('Nueva URL registrada: $newUrl');
   }
 }

@@ -1,7 +1,6 @@
-// import 'package:flutter/material.dart';
+import 'package:app_gaitan/pages/webview_app.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:app_gaitan/main.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 void main() {
