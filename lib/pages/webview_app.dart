@@ -74,21 +74,14 @@ class _WebViewAppState extends State<WebViewApp> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Center(
-                    child: Image.asset('assets/images/logo.png'),
+                    child: Image.asset('assets/images/logo.png',
+                        width: 250, height: 250),
                   ),
-                  const Text(
-                    'Tecno Escuela Gaitán...',
-                    style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 50),
+                  // const SizedBox(height: 50),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: Colors.blue,
+                      backgroundColor: const Color(0xFF257bb4),
                       padding: const EdgeInsets.symmetric(
                           horizontal: 20, vertical: 10),
                       textStyle: const TextStyle(fontSize: 20),
@@ -136,7 +129,10 @@ class _WebViewAppState extends State<WebViewApp> {
                     children: [
                       Text(
                         'Cambiar URL',
-                        style: TextStyle(fontSize: 20, color: Colors.white),
+                        style: TextStyle(
+                            fontSize: 20,
+                            color: Colors.white,
+                            backgroundColor: Color(0xFF257bb4)),
                       ),
                       SizedBox(width: 10),
                       Icon(Icons.settings, size: 28, color: Colors.white),

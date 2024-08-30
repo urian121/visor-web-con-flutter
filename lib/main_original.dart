@@ -20,7 +20,7 @@ class WebViewApp extends StatefulWidget {
 
 class _WebViewAppState extends State<WebViewApp> {
   late WebViewController _controller;
-  String _currentUrl = 'https://google.com';
+  String _currentUrl = 'http:tecnoescuelagaitan.local';
 
   @override
   void initState() {

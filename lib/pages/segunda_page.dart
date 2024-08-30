@@ -17,42 +17,59 @@ class _SegundaPageState extends State<SegundaPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tecno Escuela Gaitán',
-            style: TextStyle(fontSize: 25, color: Colors.white)),
+        title: const Text(
+          'Tecno Escuela Gaitán',
+          style: TextStyle(fontSize: 25, color: Colors.white),
+        ),
         centerTitle: true,
         backgroundColor: const Color(0xFF257bb4),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _urlController,
-                decoration: const InputDecoration(
-                  labelText: 'Cambiar la URL',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, ingrese una URL';
-                  }
-                  return null;
-                },
+        child: Column(
+          children: [
+            Center(
+              child: Image.asset(
+                'assets/images/logo.png',
+                width: 150,
+                height: 150,
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    widget.onUrlChanged(_urlController.text);
-                    Navigator.pop(context);
-                  }
-                },
-                child: const Text('Registrar URL'),
+            ),
+            Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextFormField(
+                    controller: _urlController,
+                    decoration: const InputDecoration(
+                      labelText: 'Cambiar la URL',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, ingrese una URL';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        widget.onUrlChanged(_urlController.text);
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: const Text(
+                      'Registrar URL',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
